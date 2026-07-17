@@ -1,13 +1,17 @@
+
 const listeners = new Set();
+
 const state = {
   phase: 'loading', 
   isInitialLoad: true,
 };
 
 let hideTimeout = null;
+
 function notify() {
   listeners.forEach((fn) => fn(state));
 }
+
 export function setPhase(nextPhase) {
   state.phase = nextPhase;
 
@@ -23,6 +27,7 @@ export function setPhase(nextPhase) {
       notify();
     }, 200);
   }
+
   notify();
 }
 

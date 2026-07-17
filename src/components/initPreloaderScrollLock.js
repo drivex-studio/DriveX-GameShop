@@ -1,5 +1,6 @@
 import { usePreloader } from '../hooks/usePreloader.js';
 import { subscribePreloaderState } from '../lib/preloaderState.js';
+
 import { getLenis, getCssScrollLocked, setCssScrollLocked } from '../lib/lenisState.js';
 
 function runOnMount() {

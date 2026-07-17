@@ -25,7 +25,7 @@ export const flyout = {
   
   centerImage: { 
     image: {
-      _id: 'image-c512a295f807dc326d0a163eaf21d603df6e9381-2556x1179-jpg',
+      _id: 'image-e91a652a9f52ceba1eb97fa12d177a647a63e865-1672x2508-png',
       dimensions: {
         width: 2556,
         height: 1179,
@@ -38,7 +38,7 @@ export const flyout = {
     project: { 
       uri: '/work/project-1', 
       image: {
-        _id: 'image-c512a295f807dc326d0a163eaf21d603df6e9381-2556x1179-jpg',
+        _id: 'image-e91a652a9f52ceba1eb97fa12d177a647a63e865-1672x2508-png',
         dimensions: {
           width: 2556,
           height: 1179,

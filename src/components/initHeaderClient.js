@@ -1,7 +1,7 @@
 
 import { useHeaderScrollState } from '../hooks/useHeaderScrollState.js';
 import { initMenuButton } from './MenuButton.js';
-import { initMobileNavMenu } from './initMobileNavMenu.js';
+import { initMobileNavMenu } from './MobileNavMenu.js';
 import { initHeaderLogo as HeaderLogo } from './utils/initHeaderLogo.js';
 import { initAnimatedButton } from './utils/AnimatedButton.js';
 import { cx } from '../utils/cx.js';

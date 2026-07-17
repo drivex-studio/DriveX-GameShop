@@ -1,20 +1,24 @@
-import { gsap, ScrollTrigger } from './vendor.js';
+import { gsap, ScrollTrigger } from './src/vendor.js';
 import Lenis from 'lenis';
-import { initPageTransitionState } from './lib/pageTransitionState.js';
-import { initLenisProvider, getLenis, scrollToTop } from './lib/lenisState.js';
-import { initPreloader } from './components/Preloader.js';
-import { initPreloaderScrollLock } from './components/PreloaderScrollLock.js';
-import { initSyncBodyTheme } from './components/SyncBodyTheme.js'; 
-import { initPageEnterProvider } from './components/PageEnterProvider.js';
-import { initHeaderClient } from './components/HeaderClient.js';
-import { navItems, flyout, headerCta, spotsRemaining } from './data/navData.js';
-import { initHeroSectionContent } from './features/general/HeroSectionContent.js';
-import { initHeroScrollPush } from './features/general/HeroScrollPush.js';
+import { initPageTransitionState } from './src/lib/pageTransitionState.js';
+import { initLenisProvider, getLenis, scrollToTop } from './src/lib/lenisState.js';
+import { initPreloader } from './src/components/Preloader.js';
+import { initPreloaderScrollLock } from './src/components/initPreloaderScrollLock.js';
+import { initSyncBodyTheme } from './src/components/initSyncBodyTheme.js'; 
+import { initPageEnterProvider } from './src/components/initPageEnterProvider.js';
 
-import { 
-  initCardsSection, 
-  initAnimatedListSection 
- } from './index.js';
+import { initHeaderClient } from './src/components/initHeaderClient.js';
+
+import { navItems, flyout, headerCta, spotsRemaining } from './src/data/navData.js';
+
+import { initFooterClient } from './src/components/FooterClient.js';
+import { footerProps } from './src/data/footerData.js';
+
+import { initHeroSectionContent } from './src/features/general/HeroSectionContent.js';
+
+import { initHeroScrollPush } from './src/features/general/HeroScrollPush.js';
+
+import { initCardsSection, initAnimatedListSection, initFeaturedWorkSection } from './src/index.js';
 
 let destroyLenisProvider = null;
 let destroyPageEnterProvider = null;
@@ -23,6 +27,8 @@ let heroContentInstance = null;
 let heroPushInstance = null;
 let cardsSectionInstance = null;
 let animatedListInstance = null;
+let featuredWorkInstance = null;
+let footerInstance = null;   
 
 document.addEventListener('DOMContentLoaded', () => {
   
@@ -95,36 +101,50 @@ document.addEventListener('DOMContentLoaded', () => {
   heroSectionWrapper.appendChild(heroPushInstance.element);
   mainContainer.appendChild(heroSectionWrapper);
   
-
   cardsSectionInstance = initCardsSection(mainContainer);
   
   animatedListInstance = initAnimatedListSection(mainContainer);
   
+  featuredWorkInstance = initFeaturedWorkSection(mainContainer);
+
+  footerInstance = 
+  initFooterClient(document.body, footerProps);
+
  if (heroContentInstance.mount) {
     heroContentInstance.mount();
   }
- if (animatedListInstance && animatedListInstance.mount) {
-    animatedListInstance.mount();
+if (cardsSectionInstance && cardsSectionInstance.mount) {
+  cardsSectionInstance.mount();
+}
+if (animatedListInstance && animatedListInstance.mount) {
+  animatedListInstance.mount();
+}
+if (featuredWorkInstance && featuredWorkInstance.mount) {
+  featuredWorkInstance.mount();
+}
+
+window.addEventListener('unload', () => {
+  if (typeof destroyLenisProvider === 'function') destroyLenisProvider();
+  if (typeof destroyPageEnterProvider === 'function') destroyPageEnterProvider();
+  if (typeof destroyThemeSync === 'function') destroyThemeSync();
+
+  if (heroPushInstance && typeof heroPushInstance.destroy === 'function') heroPushInstance.destroy();
+  if (heroContentInstance && typeof heroContentInstance.destroy === 'function') heroContentInstance.destroy();
+
+  if (cardsSectionInstance && typeof cardsSectionInstance.destroy === 'function') {
+    cardsSectionInstance.destroy();
   }
 
-  window.addEventListener("load", () => {
-    ScrollTrigger.refresh();
-  });
+  if (animatedListInstance && typeof animatedListInstance.destroy === 'function') {
+    animatedListInstance.destroy();
+  }
 
-  window.addEventListener('unload', () => {
-    if (typeof destroyLenisProvider === 'function') destroyLenisProvider();
-    if (typeof destroyPageEnterProvider === 'function') destroyPageEnterProvider();
-    if (typeof destroyThemeSync === 'function') destroyThemeSync();
-    
-    if (heroPushInstance && typeof heroPushInstance.destroy === 'function') heroPushInstance.destroy();
-    if (heroContentInstance && typeof heroContentInstance.destroy === 'function') heroContentInstance.destroy();
-    
-    if (cardsSectionInstance && typeof cardsSectionInstance.destroy === 'function') {
-      cardsSectionInstance.destroy();
-    }
-    
-    if (animatedListInstance && typeof animatedListInstance.destroy === 'function') {
-      animatedListInstance.destroy();
-    }
+  if (featuredWorkInstance && typeof featuredWorkInstance.destroy === 'function') {
+    featuredWorkInstance.destroy();
+  }
+
+  if (footerInstance && typeof footerInstance.destroy === 'function') {
+    footerInstance.destroy();
+  }
   });
 });

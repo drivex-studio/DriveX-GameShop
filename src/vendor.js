@@ -1,14 +1,19 @@
+
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import ScrambleTextPlugin from 'gsap/ScrambleTextPlugin';
 import CustomEase from 'gsap/CustomEase';
 import SplitText from 'gsap/SplitText';
+import Draggable from 'gsap/Draggable';
+import InertiaPlugin from 'gsap/InertiaPlugin';
 
 gsap.registerPlugin(
   ScrollTrigger,
   ScrambleTextPlugin,
   SplitText,
-  CustomEase
+  CustomEase,
+  Draggable,
+  InertiaPlugin
 );
 
 export {
@@ -16,5 +21,7 @@ export {
   ScrollTrigger,
   ScrambleTextPlugin,
   CustomEase,
-  SplitText
+  SplitText,
+  Draggable,
+  InertiaPlugin
 };

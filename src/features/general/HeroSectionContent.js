@@ -1,5 +1,6 @@
 
 import { gsap } from '../../vendor.js';
+
 import { initAnimatedHeadline } from '../AnimatedHeadline.js';
 import { initAnimatedSubtext } from '../AnimatedSubtext.js';
 import { initButtonGroup } from '../ButtonGroup.js';

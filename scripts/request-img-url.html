@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanity Image Uploader</title>
+    <style>
+        /*
+         * Base Reset & Typography 
+         */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /*
+         * Main UI Components 
+         */
+        .upload-container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .upload-title {
+            color: #0f172a;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .file-input {
+            display: block;
+            width: 100%;
+            margin-bottom: 24px;
+            padding: 16px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #475569;
+            transition: border-color 0.3s ease;
+        }
+
+        .file-input:hover {
+            border-color: #94a3b8;
+        }
+
+        .upload-btn {
+            background-color: #0f172a;
+            color: #ffffff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .upload-btn:hover {
+            background-color: #334155;
+        }
+
+        .upload-btn:active {
+            transform: scale(0.98);
+        }
+
+        .upload-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            min-height: 20px;
+            line-height: 1.6;
+        }
+
+        .success {
+            color: #16a34a;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        /*
+         * URL Link Result Styles
+         */
+        .result-link {
+            display: inline-block;
+            margin-top: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            background: #eff6ff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .result-link:hover {
+            background: #dbeafe;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="upload-container">
+        <h2 class="upload-title">Upload to Sanity</h2>
+        <form id="uploadForm">
+            <input type="file" id="imageInput" class="file-input" accept="image/*" required>
+            <button type="submit" id="uploadBtn" class="upload-btn">Upload Image</button>
+        </form>
+        <div id="statusMessage" class="status-message"></div>
+    </div> <script>
+        /*
+         * Configuration Variables
+         */
+               const SANITY_PROJECT_ID = 'epvgq6at';
+        const SANITY_DATASET = 'production';
+        const SANITY_API_TOKEN = 'sknRH3opcOzO8UrkeTWitapCdVdg4CQbcD0oBkQISMLoCWwFwAndMbGDomNgb5BRe8MAlIWEcXAMpHs9NWZCGtX7Y5KmfmsOSQmCWVRKBBAVcJ3R0lLpE13OSGVMxgjhYndfKg4pPenzYyrkhv7XaNusxIQG07vasB1CXM7MgSw4n3FH7YGl';
+        /*
+         * DOM Elements Selection
+         */
+        const uploadForm = document.getElementById('uploadForm');
+        const imageInput = document.getElementById('imageInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        /*
+         * Form Submit Event Listener
+         */
+        uploadForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const file = imageInput.files[0];
+            
+            if (!file) {
+                return;
+            }
+
+            /*
+             * UI State: Loading
+             */
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+            statusMessage.textContent = 'Please wait...';
+            statusMessage.className = 'status-message';
+
+            /*
+             * Sanity API Endpoint Construction
+             */
+            const endpoint = `https://${SANITY_PROJECT_ID}.api.sanity.io/v2021-06-07/assets/images/${SANITY_DATASET}`;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SANITY_API_TOKEN}`,
+                        'Content-Type': file.type
+                    },
+                    body: file
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    /*
+                     * Extracting URL and ID from Response
+                     */
+                    const imageUrl = data.document.url;
+                    const imageId = data.document._id;
+
+                    /*
+                     * Log both URL and Asset ID to the Browser Console
+                     */
+                    console.log('--- Upload Success ---');
+                    console.log('Uploaded Image URL:', imageUrl);
+                    console.log('Sanity Asset ID:', imageId);
+                    console.log('----------------------');
+
+                    /*
+                     * UI State: Success with Link
+                     */
+                    statusMessage.innerHTML = `Upload successful!<br><a href="${imageUrl}" target="_blank" class="result-link">View Uploaded Image</a>`;
+                    statusMessage.className = 'status-message success';
+                } else {
+                    /*
+                     * UI State: API Error
+                     */
+                    statusMessage.textContent = `Upload failed: ${data.message}`;
+                    statusMessage.className = 'status-message error';
+                }
+            } catch (error) {
+                /*
+                 * UI State: Network Error
+                 */
+                statusMessage.textContent = 'Network error occurred.';
+                statusMessage.className = 'status-message error';
+            } finally {
+                /*
+                 * UI State: Reset Form
+                 */
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Upload Image';
+                imageInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
+

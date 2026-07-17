@@ -105,18 +105,22 @@ export function initMobileNavMenu(parentElement, props = {}) {
     if (timelineRef.current?.kill) timelineRef.current.kill();
 
     if (isOpen) {
+      const linkEls = itemLinkRefs.filter(Boolean);
+      const revealEls = revealRefs.filter(Boolean);
+      if (linkEls.length > 0) gsap.set(linkEls, { yPercent: 110 });
+      if (revealEls.length > 0) gsap.set(revealEls, { yPercent: 110 });
+
       timelineRef.current = gsap.timeline();
       gsap.set(gridRootRef.current, { clipPath: 'none', gridTemplateRows: '0fr' });
       timelineRef.current.to(gridRootRef.current, { gridTemplateRows: '1fr', duration: 1, ease: 'expo.inOut' });
 
-      const linkEls = itemLinkRefs.filter(Boolean);
       if (linkEls.length > 0) {
-        timelineRef.current.fromTo(linkEls, { yPercent: 110 }, { yPercent: 0, duration: 1.4, ease: 'expo.out', stagger: 0.1, force3D: true }, '<+50%');
+        timelineRef.current.to(linkEls, { yPercent: 0, duration: 1.4, ease: 'expo.out', stagger: 0.1, force3D: true }, '<+50%');
       }
-      const revealEls = revealRefs.filter(Boolean);
       if (revealEls.length > 0) {
-        timelineRef.current.fromTo(revealEls, { yPercent: 110 }, { yPercent: 0, duration: 0.5, ease: 'power2.out', stagger: 0.04, force3D: true }, '<+25%');
+        timelineRef.current.to(revealEls, { yPercent: 0, duration: 0.5, ease: 'power2.out', stagger: 0.04, force3D: true }, '<+25%');
       }
+
       if (featuredColRef.current) {
         timelineRef.current.fromTo(featuredColRef.current, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power1.out' }, '<+25%');
       }

@@ -1,10 +1,6 @@
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { gsap, ScrollTrigger, ScrambleTextPlugin } from '../vendor.js';
 import { SplitText } from 'gsap/SplitText';
 import { easings } from './easings.js';
-
-gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin, SplitText);
 
 export function useDualLayerScramble(el, options = {}) {
     const DEFAULT_CHARS = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
@@ -24,7 +20,10 @@ export function useDualLayerScramble(el, options = {}) {
         if (text.trim().length > 0) {
             originalText = text;
             originalHtml = el.innerHTML;
-            parentDimensions = { width: el.offsetWidth, height: el.offsetHeight };
+            parentDimensions = { 
+            width: el.offsetWidth, 
+            height: el.offsetHeight 
+            };
         }
     }
     

@@ -1,4 +1,5 @@
 import { CanvasTexture, Color, Texture, Uniform } from 'three';
+
 import { Effect } from 'postprocessing';
 
 let _transientTextureRefCount = 0;
