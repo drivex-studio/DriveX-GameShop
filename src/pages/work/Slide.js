@@ -1,30 +1,16 @@
-// original component name: F -> initSlider
-// Renamed from mangled source identifiers:
-// s -> containerEl, l -> dragTargetEl, c -> draggableInstancesRef,
-// d -> dragStartXRef, u -> scrambleTriggersRef, g -> hasPlayedInitialScrambleRef,
-// m/x -> dims/setDims, v -> isDraggingRef, y -> hasDraggedRef,
-// w -> dragDistanceRef, b -> itemCount, k -> displayX, j -> springX,
-// N -> lastIndexRef, T -> dimsRef, _ -> extendedItems, S -> cloneOffset,
-// C -> totalWidth, E -> normalizeIndex, M -> goToPosition, P -> goToNext,
-// R -> goToPrev, O -> goToSlide, Y -> registerScramble, B -> hasItems
 import gsap from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
 import { cx } from '../../utils/cx.js';
 import { easings } from '../../utils/easings.js';
-import { SanityMedia, Link } from '../shared.js';
+import { initSanityMedia as SanityMedia } from '../../assets/medias/initSanityMedia.js';
+
+import { initLink as Link } from '../../components/initLink.js';
 
 gsap.registerPlugin(Draggable, InertiaPlugin);
 
 const power4InOut = easings.power4InOut;
 
-// ---- framer-motion replacements ----
-// The original component used framer-motion's `motionValue`/`animate`, which
-// isn't available in this vanilla build (not in the importmap, no React
-// render root to host it). These are minimal drop-in replacements: a
-// motionValue is just a observable box with get/set/on('change', cb), and
-// animate() tweens it using GSAP (already a project dependency) so the
-// power4InOut cubic-bezier from easings.js keeps working unchanged.
 function createMotionValue(initial = 0) {
   let current = initial;
   const listeners = new Set();
@@ -43,7 +29,7 @@ function createMotionValue(initial = 0) {
 }
 
 function cubicBezier(x1, y1, x2, y2) {
-  // Standard cubic-bezier(t) solver (same curve family CSS/framer-motion use).
+
   const cx_ = 3 * x1, bx_ = 3 * (x2 - x1) - cx_, ax_ = 1 - cx_ - bx_;
   const cy_ = 3 * y1, by_ = 3 * (y2 - y1) - cy_, ay_ = 1 - cy_ - by_;
   const sampleX = (t) => ((ax_ * t + bx_) * t + cx_) * t;
@@ -317,7 +303,6 @@ export function initSlider(parentEl, props = {}) {
 
   function setDims(nextDims) {
     dims = nextDims;
-    // useEffect(() => { resets to -cloneOffset*wrapWidth }, [cloneOffset, dims.wrapWidth])
     if (dims.wrapWidth !== 0) {
       const resetX = -cloneOffset * dims.wrapWidth;
       displayX.set(resetX);
@@ -357,12 +342,7 @@ export function initSlider(parentEl, props = {}) {
   };
 }
 
-// ---- Single slide item ----
-// Renders one case study inside the infinite draggable track. Position is
-// not driven by moving a track element; each slide computes its own
-// translateX from its index plus the shared springX position, which is how
-// the extended clone-before/clone-after arrays produce the infinite-loop
-// illusion.
+
 export function initSlide(parentEl, props = {}) {
   const {
     item,
@@ -395,7 +375,6 @@ export function initSlide(parentEl, props = {}) {
   linkEl.className = 'group block';
   linkEl.setAttribute('data-cursor-text', 'VIEW PROJECT');
 
-  // A drag gesture ending on top of a slide shouldn't trigger navigation.
   function handleClick(event) {
     if (hasDraggedRef?.current || isDraggingRef?.current) {
       event.preventDefault();
@@ -410,9 +389,12 @@ export function initSlide(parentEl, props = {}) {
   imageInnerEl.className = 'absolute inset-0';
   imageOuterEl.appendChild(imageInnerEl);
 
-  let mediaEl = null;
+  // SanityMedia takes (parentElement, props) and appends its element into
+  // imageInnerEl internally, returning an instance object ({ el, destroy, ... }),
+  // not a raw Node -- so no manual appendChild here.
+  let mediaInstance = null;
   if (item?.mainImage) {
-    mediaEl = SanityMedia({
+    mediaInstance = SanityMedia(imageInnerEl, {
       media: item.mainImage,
       className: 'h-full w-full object-cover transition-transform duration-500 group-hover:scale-105',
       imageProps: {
@@ -420,7 +402,6 @@ export function initSlide(parentEl, props = {}) {
         builderOptions: { sourceWidths: [400, 600, 800, 1000, 1200, 1400] },
       },
     });
-    if (mediaEl) imageInnerEl.appendChild(mediaEl);
   }
 
   const metaRowEl = document.createElement('div');
@@ -455,9 +436,7 @@ export function initSlide(parentEl, props = {}) {
   rootEl.appendChild(linkEl);
   parentEl.appendChild(rootEl);
 
-  // The slider calls this once per slide, then fires all of them staggered
-  // on mount/scrambleKey change (see runScrambleReveal in initSlider above).
-  // No ScrambleText util is wired in yet, so this is a plain fade-in reveal.
+
   function reveal() {
     gsap.to(titleEl, { opacity: 1, duration: 0.4, ease: 'power1.out' });
   }
@@ -468,6 +447,7 @@ export function initSlide(parentEl, props = {}) {
     destroy() {
       unsubscribe();
       linkEl.removeEventListener('click', handleClick);
+      mediaInstance?.destroy?.();
       rootEl.remove();
     },
   };

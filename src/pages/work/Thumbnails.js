@@ -83,13 +83,14 @@ export function initThumbnails(parentEl, props = {}) {
       );
 
       if (item.mainImage?.image) {
-        // SOURCE NOT PRESENT: SanityImage's real implementation is not in the input.
-        const imgEl = SanityImage({
+        // SanityImage takes (parentElement, props) and appends its element
+        // into thumbWrapper internally — matches the pattern used by
+        // initSanityMedia elsewhere (Slide.js, ProjectCard.js, List.js).
+        SanityImage(thumbWrapper, {
           image: item.mainImage.image,
           alt: item.title ?? '',
           className: 'h-full w-full object-cover',
         });
-        if (imgEl) thumbWrapper.appendChild(imgEl);
       }
 
       btn.appendChild(thumbWrapper);
